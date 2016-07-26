@@ -1,0 +1,33 @@
+{
+  "name": "node-html-decoct",
+  "version": "1.0.0",
+  "description": "Extraction of simplified HTML and images from webpages",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "mocha --reporter dot --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jijordre/html-decoct.git"
+  },
+  "keywords": [
+    "html",
+    "text",
+    "readability"
+  ],
+  "author": "Jens Ivar Jørdre <jensivar@hubii.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/jijordre/html-decoct/issues"
+  },
+  "homepage": "https://github.com/jijordre/html-decoct#readme",
+  "devDependencies": {
+    "mocha": "^2.5.3",
+    "should": "^10.0.0",
+    "sinon": "^1.17.5"
+  },
+  "dependencies": {
+    "cheerio": "^0.20.0",
+    "typescript": "^1.8.10"
+  }
+}
