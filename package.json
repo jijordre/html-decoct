@@ -23,6 +23,7 @@
   "homepage": "https://github.com/jijordre/html-decoct#readme",
   "devDependencies": {
     "mocha": "^2.5.3",
+    "proxyquire": "^1.7.10",
     "should": "^10.0.0",
     "sinon": "^1.17.5"
   },
