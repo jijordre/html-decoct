@@ -8,10 +8,6 @@ import proxyquire = require('proxyquire');
 import Requestor from "../src/request/requestor";
 import Extractor from "../src/extract/extractor";
 
-interface DefaultWrapped<T> {
-    'default':T
-}
-
 interface HTMLDecoct {
     getSimplifiedHTML(src:string, callback:(err:any, result:any) => void):void;
     getCleanHTML(src:string, callback:(err:any, result:any) => void):void;
@@ -21,28 +17,56 @@ interface HTMLDecoct {
 let requestStub;
 let extractStub;
 
+class SimplifiedHTMLExtractor implements Extractor {
+    extract(html:string, callback:(err:any, result:any)=>void):void {
+        extractStub(html, callback);
+    }
+}
+
+class CleanTextExtractor implements Extractor {
+    extract(html:string, callback:(err:any, result:any)=>void):void {
+        extractStub(html, callback);
+    }
+}
+
+class ImageURLExtractor implements Extractor {
+    extract(html:string, callback:(err:any, result:any)=>void):void {
+        extractStub(html, callback);
+    }
+}
+
+class HTTPRequestor implements Requestor {
+    request(url:string, callback:(err:any, result:any)=>void):void {
+        requestStub(url, callback);
+    }
+}
+
+interface DefaultWrapped<T> {
+    'default':T
+}
+
 describe('HTMLDecoct', function () {
 
-    let SimplifiedHTMLExtractor:DefaultWrapped<Extractor> = null;
-    let CleanTextExtractor:DefaultWrapped<Extractor> = null;
-    let ImageURLExtractor:DefaultWrapped<Extractor> = null;
-    let HTTPRequestor:DefaultWrapped<Requestor> = null;
+    let SimplifiedHTMLExtractorDefaultWrapped:DefaultWrapped<typeof SimplifiedHTMLExtractor> = null;
+    let CleanTextExtractorDefaultWrapped:DefaultWrapped<typeof CleanTextExtractor> = null;
+    let ImageURLExtractorDefaultWrapped:DefaultWrapped<typeof ImageURLExtractor> = null;
+    let HTTPRequestorDefaultWrapped:DefaultWrapped<typeof HTTPRequestor> = null;
     let decoct:HTMLDecoct = null;
 
     beforeEach(function () {
         requestStub = sinon.stub().yields(null, {});
         extractStub = sinon.stub().yields(null, {});
 
-        SimplifiedHTMLExtractor = mockSimplifiedHTMLExtractor();
-        CleanTextExtractor = mockCleanTextExtractor();
-        ImageURLExtractor = mockImageURLExtractor();
-        HTTPRequestor = mockHTTPRequestor();
+        SimplifiedHTMLExtractorDefaultWrapped = mockDefaultWrapped(SimplifiedHTMLExtractor);
+        CleanTextExtractorDefaultWrapped = mockDefaultWrapped(CleanTextExtractor);
+        ImageURLExtractorDefaultWrapped = mockDefaultWrapped(ImageURLExtractor);
+        HTTPRequestorDefaultWrapped = mockDefaultWrapped(HTTPRequestor);
 
         let HTMLDecoct = proxyquire('../src/index', {
-            './extract/simplified-html-extractor': SimplifiedHTMLExtractor,
-            './extract/clean-text-extractor': CleanTextExtractor,
-            './extract/image-url-extractor': ImageURLExtractor,
-            './request/http-requestor': HTTPRequestor
+            './extract/simplified-html-extractor': SimplifiedHTMLExtractorDefaultWrapped,
+            './extract/clean-text-extractor': CleanTextExtractorDefaultWrapped,
+            './extract/image-url-extractor': ImageURLExtractorDefaultWrapped,
+            './request/http-requestor': HTTPRequestorDefaultWrapped
         })['default'];
 
         decoct = new HTMLDecoct();
@@ -171,58 +195,6 @@ describe('HTMLDecoct', function () {
         });
     });
 });
-
-function mockSimplifiedHTMLExtractor():DefaultWrapped<Extractor> {
-    class SimplifiedHTMLExtractor implements Extractor {
-        constructor() {
-        }
-
-        extract(html:string, callback:(err:any, result:any)=>void):void {
-            extractStub(html, callback);
-        }
-    }
-
-    return mockDefaultWrapped(SimplifiedHTMLExtractor);
-}
-
-function mockCleanTextExtractor():DefaultWrapped<Extractor> {
-    class CleanTextExtractor implements Extractor {
-        constructor() {
-        }
-
-        extract(html:string, callback:(err:any, result:any)=>void):void {
-            extractStub(html, callback);
-        }
-    }
-
-    return mockDefaultWrapped(CleanTextExtractor);
-}
-
-function mockImageURLExtractor():DefaultWrapped<Extractor> {
-    class ImageURLExtractor implements Extractor {
-        constructor() {
-        }
-
-        extract(html:string, callback:(err:any, result:any)=>void):void {
-            extractStub(html, callback);
-        }
-    }
-
-    return mockDefaultWrapped(ImageURLExtractor);
-}
-
-function mockHTTPRequestor():DefaultWrapped<Requestor> {
-    class HTTPRequestor implements Requestor {
-        constructor() {
-        }
-
-        request(url:string, callback:(err:any, result:any)=>void):void {
-            requestStub(url, callback);
-        }
-    }
-
-    return mockDefaultWrapped(HTTPRequestor);
-}
 
 function mockDefaultWrapped<T>(defaultValue:T):DefaultWrapped<T> {
     let wrapper:DefaultWrapped<T> = {

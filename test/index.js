@@ -8,24 +8,56 @@ var should = require('should');
 var proxyquire = require('proxyquire');
 var requestStub;
 var extractStub;
+var SimplifiedHTMLExtractor = (function () {
+    function SimplifiedHTMLExtractor() {
+    }
+    SimplifiedHTMLExtractor.prototype.extract = function (html, callback) {
+        extractStub(html, callback);
+    };
+    return SimplifiedHTMLExtractor;
+}());
+var CleanTextExtractor = (function () {
+    function CleanTextExtractor() {
+    }
+    CleanTextExtractor.prototype.extract = function (html, callback) {
+        extractStub(html, callback);
+    };
+    return CleanTextExtractor;
+}());
+var ImageURLExtractor = (function () {
+    function ImageURLExtractor() {
+    }
+    ImageURLExtractor.prototype.extract = function (html, callback) {
+        extractStub(html, callback);
+    };
+    return ImageURLExtractor;
+}());
+var HTTPRequestor = (function () {
+    function HTTPRequestor() {
+    }
+    HTTPRequestor.prototype.request = function (url, callback) {
+        requestStub(url, callback);
+    };
+    return HTTPRequestor;
+}());
 describe('HTMLDecoct', function () {
-    var SimplifiedHTMLExtractor = null;
-    var CleanTextExtractor = null;
-    var ImageURLExtractor = null;
-    var HTTPRequestor = null;
+    var SimplifiedHTMLExtractorDefaultWrapped = null;
+    var CleanTextExtractorDefaultWrapped = null;
+    var ImageURLExtractorDefaultWrapped = null;
+    var HTTPRequestorDefaultWrapped = null;
     var decoct = null;
     beforeEach(function () {
         requestStub = sinon.stub().yields(null, {});
         extractStub = sinon.stub().yields(null, {});
-        SimplifiedHTMLExtractor = mockSimplifiedHTMLExtractor();
-        CleanTextExtractor = mockCleanTextExtractor();
-        ImageURLExtractor = mockImageURLExtractor();
-        HTTPRequestor = mockHTTPRequestor();
+        SimplifiedHTMLExtractorDefaultWrapped = mockDefaultWrapped(SimplifiedHTMLExtractor);
+        CleanTextExtractorDefaultWrapped = mockDefaultWrapped(CleanTextExtractor);
+        ImageURLExtractorDefaultWrapped = mockDefaultWrapped(ImageURLExtractor);
+        HTTPRequestorDefaultWrapped = mockDefaultWrapped(HTTPRequestor);
         var HTMLDecoct = proxyquire('../src/index', {
-            './extract/simplified-html-extractor': SimplifiedHTMLExtractor,
-            './extract/clean-text-extractor': CleanTextExtractor,
-            './extract/image-url-extractor': ImageURLExtractor,
-            './request/http-requestor': HTTPRequestor
+            './extract/simplified-html-extractor': SimplifiedHTMLExtractorDefaultWrapped,
+            './extract/clean-text-extractor': CleanTextExtractorDefaultWrapped,
+            './extract/image-url-extractor': ImageURLExtractorDefaultWrapped,
+            './request/http-requestor': HTTPRequestorDefaultWrapped
         })['default'];
         decoct = new HTMLDecoct();
     });
@@ -135,50 +167,6 @@ describe('HTMLDecoct', function () {
         });
     });
 });
-function mockSimplifiedHTMLExtractor() {
-    var SimplifiedHTMLExtractor = (function () {
-        function SimplifiedHTMLExtractor() {
-        }
-        SimplifiedHTMLExtractor.prototype.extract = function (html, callback) {
-            extractStub(html, callback);
-        };
-        return SimplifiedHTMLExtractor;
-    }());
-    return mockDefaultWrapped(SimplifiedHTMLExtractor);
-}
-function mockCleanTextExtractor() {
-    var CleanTextExtractor = (function () {
-        function CleanTextExtractor() {
-        }
-        CleanTextExtractor.prototype.extract = function (html, callback) {
-            extractStub(html, callback);
-        };
-        return CleanTextExtractor;
-    }());
-    return mockDefaultWrapped(CleanTextExtractor);
-}
-function mockImageURLExtractor() {
-    var ImageURLExtractor = (function () {
-        function ImageURLExtractor() {
-        }
-        ImageURLExtractor.prototype.extract = function (html, callback) {
-            extractStub(html, callback);
-        };
-        return ImageURLExtractor;
-    }());
-    return mockDefaultWrapped(ImageURLExtractor);
-}
-function mockHTTPRequestor() {
-    var HTTPRequestor = (function () {
-        function HTTPRequestor() {
-        }
-        HTTPRequestor.prototype.request = function (url, callback) {
-            requestStub(url, callback);
-        };
-        return HTTPRequestor;
-    }());
-    return mockDefaultWrapped(HTTPRequestor);
-}
 function mockDefaultWrapped(defaultValue) {
     var wrapper = {
         'default': defaultValue
