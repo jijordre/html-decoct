@@ -27,7 +27,7 @@ var HTMLDecoct = (function () {
             extractor.extract(src, callback);
         }
     };
-    HTMLDecoct.prototype.getImages = function (src, callback) {
+    HTMLDecoct.prototype.getImageURLs = function (src, callback) {
         var html = this.isHTML(src);
         var extractor = new image_url_extractor_1["default"]();
         if (!html) {

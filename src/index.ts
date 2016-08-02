@@ -31,7 +31,7 @@ export default class HTMLDecoct {
         }
     }
 
-    getImages(src:string, callback:(err:any, result:any) => void):void {
+    getImageURLs(src:string, callback:(err:any, result:any) => void):void {
         let html = this.isHTML(src);
         let extractor:Extractor = new ImageURLExtractor();
         if (!html) {

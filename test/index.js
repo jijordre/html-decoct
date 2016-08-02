@@ -122,11 +122,11 @@ describe('HTMLDecoct', function () {
             });
         });
     });
-    describe('#getImages', function () {
+    describe('#getImageURLs', function () {
         describe('with URL src', function () {
             it('extracts image URLs when requestor succeeds', function (done) {
                 requestStub = sinon.stub().yields(null, '<html>some HTML</html>');
-                decoct.getImages('some URL', function (err, result) {
+                decoct.getImageURLs('some URL', function (err, result) {
                     sinon.assert.calledOnce(requestStub);
                     sinon.assert.calledWith(extractStub, '<html>some HTML</html>');
                     should.not.exist(err);
@@ -136,7 +136,7 @@ describe('HTMLDecoct', function () {
             });
             it('does not extracts image URLs when requestor fails', function (done) {
                 requestStub = sinon.stub().yields('some error');
-                decoct.getImages('some URL', function (err, result) {
+                decoct.getImageURLs('some URL', function (err, result) {
                     sinon.assert.calledOnce(requestStub);
                     sinon.assert.notCalled(extractStub);
                     err.should.equal('some error');
@@ -147,7 +147,7 @@ describe('HTMLDecoct', function () {
         });
         describe('with HTML src', function () {
             it('extracts image URLs', function (done) {
-                decoct.getImages('<html>some HTML</html>', function (err, result) {
+                decoct.getImageURLs('<html>some HTML</html>', function (err, result) {
                     sinon.assert.notCalled(requestStub);
                     sinon.assert.calledOnce(extractStub);
                     should.not.exist(err);
