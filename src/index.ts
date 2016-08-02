@@ -1,8 +1,8 @@
-import {Extractor} from "./extract/extractor";
+import Extractor from "./extract/extractor";
 import SimplifiedHTMLExtractor from "./extract/simplified-html-extractor";
 import CleanTextExtractor from "./extract/clean-text-extractor";
 import ImageURLExtractor from "./extract/image-url-extractor";
-import {Requestor} from "./request/requestor";
+import Requestor from "./request/requestor";
 import HTTPRequestor from "./request/http-requestor";
 
 export default class HTMLDecoct {

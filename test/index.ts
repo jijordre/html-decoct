@@ -5,8 +5,8 @@
 import sinon = require('sinon');
 import should = require('should');
 import proxyquire = require('proxyquire');
-import {Extractor} from '../src/extract/extractor';
-import {Requestor} from '../src/request/requestor';
+import Requestor from "../src/request/requestor";
+import Extractor from "../src/extract/extractor";
 
 interface DefaultWrapped<T> {
     'default':T
@@ -18,6 +18,9 @@ interface HTMLDecoct {
     getImages(src:string, callback:(err:any, result:any) => void):void;
 }
 
+let requestStub;
+let extractStub;
+
 describe('HTMLDecoct', function () {
 
     let SimplifiedHTMLExtractor:DefaultWrapped<Extractor> = null;
@@ -27,6 +30,9 @@ describe('HTMLDecoct', function () {
     let decoct:HTMLDecoct = null;
 
     beforeEach(function () {
+        requestStub = sinon.stub().yields(null, {});
+        extractStub = sinon.stub().yields(null, {});
+
         SimplifiedHTMLExtractor = mockSimplifiedHTMLExtractor();
         CleanTextExtractor = mockCleanTextExtractor();
         ImageURLExtractor = mockImageURLExtractor();
@@ -47,10 +53,10 @@ describe('HTMLDecoct', function () {
         describe('with URL src', function () {
 
             it('extracts simplified HTML when requestor succeeds', function (done) {
-                HTTPRequestor.default.prototype.request = sinon.stub().yields(null, '<html>some HTML</html>');
+                requestStub = sinon.stub().yields(null, '<html>some HTML</html>');
                 decoct.getSimplifiedHTML('some URL', function (err, result) {
-                    sinon.assert.calledOnce(HTTPRequestor.default.prototype.request);
-                    sinon.assert.calledWith(SimplifiedHTMLExtractor.default.prototype.extract, '<html>some HTML</html>');
+                    sinon.assert.calledOnce(requestStub);
+                    sinon.assert.calledWith(extractStub, '<html>some HTML</html>');
                     should.not.exist(err);
                     should.exist(result);
                     done();
@@ -58,10 +64,10 @@ describe('HTMLDecoct', function () {
             });
 
             it('does not extract simplified HTML when requestor fails', function (done) {
-                HTTPRequestor.default.prototype.request = sinon.stub().yields('some error');
+                requestStub = sinon.stub().yields('some error');
                 decoct.getSimplifiedHTML('some URL', function (err, result) {
-                    sinon.assert.calledOnce(HTTPRequestor.default.prototype.request);
-                    sinon.assert.notCalled(SimplifiedHTMLExtractor.default.prototype.extract);
+                    sinon.assert.calledOnce(requestStub);
+                    sinon.assert.notCalled(extractStub);
                     err.should.equal('some error');
                     should.not.exist(result);
                     done();
@@ -73,8 +79,8 @@ describe('HTMLDecoct', function () {
 
             it('extracts simplified HTML', function (done) {
                 decoct.getSimplifiedHTML('<html>some HTML</html>', function (err, result) {
-                    sinon.assert.notCalled(HTTPRequestor.default.prototype.request);
-                    sinon.assert.calledOnce(SimplifiedHTMLExtractor.default.prototype.extract);
+                    sinon.assert.notCalled(requestStub);
+                    sinon.assert.calledOnce(extractStub);
                     should.not.exist(err);
                     should.exist(result);
                     done();
@@ -88,10 +94,10 @@ describe('HTMLDecoct', function () {
         describe('with URL src', function () {
 
             it('extracts clean HTML when requestor succeeds', function (done) {
-                HTTPRequestor.default.prototype.request = sinon.stub().yields(null, '<html>some HTML</html>');
+                requestStub = sinon.stub().yields(null, '<html>some HTML</html>');
                 decoct.getCleanHTML('some URL', function (err, result) {
-                    sinon.assert.calledOnce(HTTPRequestor.default.prototype.request);
-                    sinon.assert.calledWith(CleanTextExtractor.default.prototype.extract, '<html>some HTML</html>');
+                    sinon.assert.calledOnce(requestStub);
+                    sinon.assert.calledWith(extractStub, '<html>some HTML</html>');
                     should.not.exist(err);
                     should.exist(result);
                     done();
@@ -99,10 +105,10 @@ describe('HTMLDecoct', function () {
             });
 
             it('does not extract clean HTML when requestor fails', function (done) {
-                HTTPRequestor.default.prototype.request = sinon.stub().yields('some error');
+                requestStub = sinon.stub().yields('some error');
                 decoct.getCleanHTML('some URL', function (err, result) {
-                    sinon.assert.calledOnce(HTTPRequestor.default.prototype.request);
-                    sinon.assert.notCalled(CleanTextExtractor.default.prototype.extract);
+                    sinon.assert.calledOnce(requestStub);
+                    sinon.assert.notCalled(extractStub);
                     err.should.equal('some error');
                     should.not.exist(result);
                     done();
@@ -114,8 +120,8 @@ describe('HTMLDecoct', function () {
 
             it('extracts clean HTML', function (done) {
                 decoct.getCleanHTML('<html>some HTML</html>', function (err, result) {
-                    sinon.assert.notCalled(HTTPRequestor.default.prototype.request);
-                    sinon.assert.calledOnce(CleanTextExtractor.default.prototype.extract);
+                    sinon.assert.notCalled(requestStub);
+                    sinon.assert.calledOnce(extractStub);
                     should.not.exist(err);
                     should.exist(result);
                     done();
@@ -129,10 +135,10 @@ describe('HTMLDecoct', function () {
         describe('with URL src', function () {
 
             it('extracts image URLs when requestor succeeds', function (done) {
-                HTTPRequestor.default.prototype.request = sinon.stub().yields(null, '<html>some HTML</html>');
+                requestStub = sinon.stub().yields(null, '<html>some HTML</html>');
                 decoct.getImages('some URL', function (err, result) {
-                    sinon.assert.calledOnce(HTTPRequestor.default.prototype.request);
-                    sinon.assert.calledWith(ImageURLExtractor.default.prototype.extract, '<html>some HTML</html>');
+                    sinon.assert.calledOnce(requestStub);
+                    sinon.assert.calledWith(extractStub, '<html>some HTML</html>');
                     should.not.exist(err);
                     should.exist(result);
                     done();
@@ -140,10 +146,10 @@ describe('HTMLDecoct', function () {
             });
 
             it('does not extracts image URLs when requestor fails', function (done) {
-                HTTPRequestor.default.prototype.request = sinon.stub().yields('some error');
+                requestStub = sinon.stub().yields('some error');
                 decoct.getImages('some URL', function (err, result) {
-                    sinon.assert.calledOnce(HTTPRequestor.default.prototype.request);
-                    sinon.assert.notCalled(ImageURLExtractor.default.prototype.extract);
+                    sinon.assert.calledOnce(requestStub);
+                    sinon.assert.notCalled(extractStub);
                     err.should.equal('some error');
                     should.not.exist(result);
                     done();
@@ -155,8 +161,8 @@ describe('HTMLDecoct', function () {
 
             it('extracts image URLs', function (done) {
                 decoct.getImages('<html>some HTML</html>', function (err, result) {
-                    sinon.assert.notCalled(HTTPRequestor.default.prototype.request);
-                    sinon.assert.calledOnce(ImageURLExtractor.default.prototype.extract);
+                    sinon.assert.notCalled(requestStub);
+                    sinon.assert.calledOnce(extractStub);
                     should.not.exist(err);
                     should.exist(result);
                     done();
@@ -167,51 +173,55 @@ describe('HTMLDecoct', function () {
 });
 
 function mockSimplifiedHTMLExtractor():DefaultWrapped<Extractor> {
-    let extractor:Extractor = (function () {
-        function SimplifiedHTMLExtractor() {
+    class SimplifiedHTMLExtractor implements Extractor {
+        constructor() {
         }
 
-        SimplifiedHTMLExtractor.prototype.extract = sinon.stub().yields(null, {});
-        return SimplifiedHTMLExtractor;
-    }());
+        extract(html:string, callback:(err:any, result:any)=>void):void {
+            extractStub(html, callback);
+        }
+    }
 
-    return mockDefaultWrapped(extractor);
+    return mockDefaultWrapped(SimplifiedHTMLExtractor);
 }
 
 function mockCleanTextExtractor():DefaultWrapped<Extractor> {
-    let extractor:Extractor = (function () {
-        function CleanTextExtractor() {
+    class CleanTextExtractor implements Extractor {
+        constructor() {
         }
 
-        CleanTextExtractor.prototype.extract = sinon.stub().yields(null, {});
-        return CleanTextExtractor;
-    }());
+        extract(html:string, callback:(err:any, result:any)=>void):void {
+            extractStub(html, callback);
+        }
+    }
 
-    return mockDefaultWrapped(extractor);
+    return mockDefaultWrapped(CleanTextExtractor);
 }
 
 function mockImageURLExtractor():DefaultWrapped<Extractor> {
-    let extractor:Extractor = (function () {
-        function ImageURLExtractor() {
+    class ImageURLExtractor implements Extractor {
+        constructor() {
         }
 
-        ImageURLExtractor.prototype.extract = sinon.stub().yields(null, {});
-        return ImageURLExtractor;
-    }());
+        extract(html:string, callback:(err:any, result:any)=>void):void {
+            extractStub(html, callback);
+        }
+    }
 
-    return mockDefaultWrapped(extractor);
+    return mockDefaultWrapped(ImageURLExtractor);
 }
 
 function mockHTTPRequestor():DefaultWrapped<Requestor> {
-    let requestor:Requestor = (function () {
-        function HTTPRequestor() {
+    class HTTPRequestor implements Requestor {
+        constructor() {
         }
 
-        HTTPRequestor.prototype.request = sinon.stub().yields(null, {});
-        return HTTPRequestor;
-    }());
+        request(url:string, callback:(err:any, result:any)=>void):void {
+            requestStub(url, callback);
+        }
+    }
 
-    return mockDefaultWrapped(requestor);
+    return mockDefaultWrapped(HTTPRequestor);
 }
 
 function mockDefaultWrapped<T>(defaultValue:T):DefaultWrapped<T> {

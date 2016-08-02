@@ -1,4 +1,4 @@
-import {Extractor} from "./extractor";
+import Extractor from "./extractor";
 
 export default class SimplifiedHTMLExtractor implements Extractor {
 
