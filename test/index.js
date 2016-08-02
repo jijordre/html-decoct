@@ -41,25 +41,16 @@ var HTTPRequestor = (function () {
     return HTTPRequestor;
 }());
 describe('HTMLDecoct', function () {
-    var SimplifiedHTMLExtractorDefaultWrapped = null;
-    var CleanTextExtractorDefaultWrapped = null;
-    var ImageURLExtractorDefaultWrapped = null;
-    var HTTPRequestorDefaultWrapped = null;
-    var decoct = null;
+    var HTMLDecoct = proxyquire('../src/index', {
+        './extract/simplified-html-extractor': mockDefaultWrapped(SimplifiedHTMLExtractor),
+        './extract/clean-text-extractor': mockDefaultWrapped(CleanTextExtractor),
+        './extract/image-url-extractor': mockDefaultWrapped(ImageURLExtractor),
+        './request/http-requestor': mockDefaultWrapped(HTTPRequestor)
+    })['default'];
+    var decoct = new HTMLDecoct();
     beforeEach(function () {
         requestStub = sinon.stub().yields(null, {});
         extractStub = sinon.stub().yields(null, {});
-        SimplifiedHTMLExtractorDefaultWrapped = mockDefaultWrapped(SimplifiedHTMLExtractor);
-        CleanTextExtractorDefaultWrapped = mockDefaultWrapped(CleanTextExtractor);
-        ImageURLExtractorDefaultWrapped = mockDefaultWrapped(ImageURLExtractor);
-        HTTPRequestorDefaultWrapped = mockDefaultWrapped(HTTPRequestor);
-        var HTMLDecoct = proxyquire('../src/index', {
-            './extract/simplified-html-extractor': SimplifiedHTMLExtractorDefaultWrapped,
-            './extract/clean-text-extractor': CleanTextExtractorDefaultWrapped,
-            './extract/image-url-extractor': ImageURLExtractorDefaultWrapped,
-            './request/http-requestor': HTTPRequestorDefaultWrapped
-        })['default'];
-        decoct = new HTMLDecoct();
     });
     describe('#getSimplifiedHTML', function () {
         describe('with URL src', function () {

@@ -47,29 +47,18 @@ interface DefaultWrapped<T> {
 
 describe('HTMLDecoct', function () {
 
-    let SimplifiedHTMLExtractorDefaultWrapped:DefaultWrapped<typeof SimplifiedHTMLExtractor> = null;
-    let CleanTextExtractorDefaultWrapped:DefaultWrapped<typeof CleanTextExtractor> = null;
-    let ImageURLExtractorDefaultWrapped:DefaultWrapped<typeof ImageURLExtractor> = null;
-    let HTTPRequestorDefaultWrapped:DefaultWrapped<typeof HTTPRequestor> = null;
-    let decoct:HTMLDecoct = null;
+    let HTMLDecoct = proxyquire('../src/index', {
+        './extract/simplified-html-extractor': mockDefaultWrapped(SimplifiedHTMLExtractor),
+        './extract/clean-text-extractor': mockDefaultWrapped(CleanTextExtractor),
+        './extract/image-url-extractor': mockDefaultWrapped(ImageURLExtractor),
+        './request/http-requestor': mockDefaultWrapped(HTTPRequestor)
+    })['default'];
+
+    let decoct:HTMLDecoct = new HTMLDecoct();
 
     beforeEach(function () {
         requestStub = sinon.stub().yields(null, {});
         extractStub = sinon.stub().yields(null, {});
-
-        SimplifiedHTMLExtractorDefaultWrapped = mockDefaultWrapped(SimplifiedHTMLExtractor);
-        CleanTextExtractorDefaultWrapped = mockDefaultWrapped(CleanTextExtractor);
-        ImageURLExtractorDefaultWrapped = mockDefaultWrapped(ImageURLExtractor);
-        HTTPRequestorDefaultWrapped = mockDefaultWrapped(HTTPRequestor);
-
-        let HTMLDecoct = proxyquire('../src/index', {
-            './extract/simplified-html-extractor': SimplifiedHTMLExtractorDefaultWrapped,
-            './extract/clean-text-extractor': CleanTextExtractorDefaultWrapped,
-            './extract/image-url-extractor': ImageURLExtractorDefaultWrapped,
-            './request/http-requestor': HTTPRequestorDefaultWrapped
-        })['default'];
-
-        decoct = new HTMLDecoct();
     });
 
     describe('#getSimplifiedHTML', function () {
